@@ -151,14 +151,18 @@ namespace Flakey
             {
                 var timestamp = this.GetTimestamp() & MASK_TIME;
                 if (timestamp < _lastgen)
-                    throw new InvalidSystemClockException(string.Format("Clock moved backwards or wrapped around. Refusing to generate id for {0} milliseconds", _lastgen - timestamp));
+                    throw new InvalidSystemClockException($"Clock moved backwards or wrapped around. Refusing to generate id for {_lastgen - timestamp} milliseconds");
 
                 if (timestamp == _lastgen)
                 {
                     if (_sequence < MASK_SEQUENCE)
                         _sequence++;
                     else
-                        throw new SequenceOverflowException("Sequence overflow. Refusing to generate id for rest of millisecond");
+                    {
+                        timestamp = TillNextMillis(_lastgen);
+                        _sequence = 0;
+                        _lastgen = timestamp;
+                    }
                 }
                 else
                 {
@@ -334,6 +338,20 @@ namespace Flakey
         private long GetTimestamp()
         {
             return (long)(_timesource.GetTime() - _epoch).TotalMilliseconds;
+        }
+
+        private long TillNextMillis(long lastTimestamp)
+        {
+            var timestamp = this.GetTimestamp() & MASK_TIME;
+
+            // This should complete within this millisecond.  If we spin more than 100ms, something is wrong.
+            const int maxSpin = 100;
+            bool completed = SpinWait.SpinUntil(() => (timestamp = this.GetTimestamp() & MASK_TIME) > lastTimestamp, maxSpin);
+            
+            if (!completed)
+                throw new SequenceOverflowException("Unable to wait for sequence to reset");
+
+            return timestamp;
         }
 
         /// <summary>

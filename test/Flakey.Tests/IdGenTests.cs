@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -23,6 +25,18 @@ namespace Flakey
             Assert.Equal(1, g.CreateId());
             Assert.Equal(2, g.CreateId());
         }
+
+        [Fact]
+        public void Sequence_ShouldIncrease_LargeInvocation()
+        {
+            var g = new IdGenerator(0);
+            var list = g.Take(10000).ToList();
+
+            for (int i = 1; i < list.Count; ++i)
+                Assert.True(list[i] > list[i - 1], $"Results out of order: Result[{i - 1}]: {list[i - 1]}  Result[{i}]: {list[i]}");
+
+        }
+
 
         [Fact]
         public void Sequence_ShouldReset_EveryNewTick()
@@ -113,7 +127,7 @@ namespace Flakey
         }
 
         [Fact]
-        public void CreateId_Throws_OnSequenceOverflow()
+        public void CreateId_Pauses_OnSequenceOverflow()
         {
             var ts = new MockTimeSource(TESTEPOCH);
             var g = new IdGenerator(0, TESTEPOCH, new MaskConfig(41, 20, 2), ts);
@@ -122,9 +136,25 @@ namespace Flakey
             for (int i = 0; i < 4; i++)
                 Assert.Equal(i, g.CreateId());
 
-            // However, if we invoke once more we should get an SequenceOverflowException
-           Assert.Throws<SequenceOverflowException>(() => g.CreateId() );
+            var createIdFinished = new ManualResetEvent(false);
+
+            var thread = new Thread(() =>
+            {
+                g.CreateId();
+                createIdFinished.Set();
+            });
+
+            thread.Start();
+
+            bool finished = createIdFinished.WaitOne(20);
+            Assert.True(!finished);
+
+            ts.NextTick();
+
+            finished = createIdFinished.WaitOne(20);
+            Assert.True(finished);
         }
+
 
         //[Fact]
         //public void CheckAllCombinationsForMaskConfigs()
@@ -246,5 +276,6 @@ namespace Flakey
             Assert.Same(md, new IdGenerator(0, TESTEPOCH, md).MaskConfig);
             Assert.Same(mc, new IdGenerator(0, TESTEPOCH, mc).MaskConfig);
         }
+
     }
 }
