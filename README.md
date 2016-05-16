@@ -115,7 +115,7 @@ Wraparound interval   : 407226.12:41:28.8320000 (about 1114 years)
 Wraparound date       : 3130-03-13T12:41:28.8320000Z
 ```
 
-Flakey also provides an `ITimeSouce` interface; this can be handy for [unittesting](test/Flakey.Tests/IdGenTests.cs) purposes or if you want to provide a time-source for the timestamp part of your Id's that is not based on the system time. By default the IdGenerator uses the `DefaultTimeSource` which, internally, uses [QueryPerformanceCounter](https://msdn.microsoft.com/en-us/library/windows/desktop/ms644904.aspx). For unittesting we use our own [MockTimeSource](IdGenTests/MockTimeSource.cs).
+Flakey also provides an `ITimeSouce` interface; this can be handy for [unittesting](test/Flakey.Tests/IdGenTests.cs) purposes or if you want to provide a time-source for the timestamp part of your Id's that is not based on the system time. By default the IdGenerator uses the `DefaultTimeSource` which, internally, uses [QueryPerformanceCounter](https://msdn.microsoft.com/en-us/library/windows/desktop/ms644904.aspx). For unittesting we use our own [MockTimeSource](test/Flakey.Tests/MockTimeSource.cs).
 
 The following constructor overloads are available:
 
@@ -128,7 +128,7 @@ IdGenerator(int generatorId, DateTime epoch, MaskConfig maskConfig, ITimeSource 
 
 All properties are read-only to prevent changes once an `IdGenerator` has been instantiated.
 
-The `IdGenerator` class provides three 'factory methods' to quickly create a machine-specific (based on the hostname), thread-specific or based on `app.config` (or `web.config`) `IdGenerator`:
+The `IdGenerator` class provides two 'factory methods' to quickly create a machine-specific (based on the hostname) or thread-specific `IdGenerator`:
 
 `var generator = IdGenerator.CreateMachineSpecificGenerator();`
 
@@ -138,39 +138,10 @@ or:
 
 These methods (and their overloads that allow you to specify the epoch, `MaskConfig` and `TimeSource`) create an `IdGenerator` based on hostname or (managed) thread-id. However, it is recommended you explicitly set / configure a generator-id since these two methods could cause 'collisions' when machinenames' hashes result in the same id's or when thread-id's collide with thread-id's on other machines.
 
-Then we have `GetFromConfig("name")`; it differs in a subtle way (besides using values from the configuration file) with the previous two methods: `CreateMachineSpecificGenerator` and `CreateThreadSpecificGenerator` both create a new instance every call whereas `GetFromConfig(string)` returns the same instance with the same name every time. You can add the following to your configuration:
-
-```xml
-<configuration>
-  <configSections>
-    <section name="idGenSection" type="IdGen.Configuration.IdGeneratorsSection, IdGen" />
-  </configSections>
-
-  <idGenSection>
-    <idGenerators>
-      <idGenerator name="foo" id="123"  epoch="2016-01-02T12:34:56" timestampBits="39" generatorIdBits="11" sequenceBits="13" />
-      <idGenerator name="bar" id="987"  epoch="2016-02-01 01:23:45" timestampBits="20" generatorIdBits="21" sequenceBits="22" />
-      <idGenerator name="baz" id="2047" epoch="2016-02-29"          timestampBits="21" generatorIdBits="21" sequenceBits="21" />
-    </idGenerators>
-  </idGenSection>
-  
-</configuration>
-```
-
-All attributes (`name`, `id`, `epoch`, `timestampBits`, `generatorIdBits` and `sequenceBits`) are required. Valid DateTime notations for the epoch are:
-
-* `yyyy-MM-ddTHH:mm:ss`
-* `yyyy-MM-dd HH:mm:ss`
-* `yyyy-MM-dd`
-
-You can get the IdGenerator from the config using the following code:
-
-`var generator = IdGenerator.GetFromConfig("foo");`
 
 <hr>
 
-[![Build status](https://ci.appveyor.com/api/projects/status/24wqqq91u0arkf5t)](https://ci.appveyor.com/project/RobIII/idgen) <a href="https://www.nuget.org/packages/IdGen/"><img src="http://img.shields.io/nuget/v/IdGen.svg?style=flat-square" alt="NuGet version" height="18"></a> <a href="https://www.nuget.org/packages/IdGen/"><img src="http://img.shields.io/nuget/dt/IdGen.svg?style=flat-square" alt="NuGet downloads" height="18"></a>
+[![Build status](https://ci.appveyor.com/api/projects/status/gw40b0nwaedgvilg?svg=true)](https://ci.appveyor.com/project/joshclark/flakey) <a href="https://www.nuget.org/packages/Flakey/"><img src="http://img.shields.io/nuget/v/Flakey.svg?style=flat-square" alt="NuGet version" height="18"></a> <a href="https://www.nuget.org/packages/Flakey/"><img src="http://img.shields.io/nuget/dt/Flakey.svg?style=flat-square" alt="NuGet downloads" height="18"></a>
 
-Icon made by [Freepik](http://www.flaticon.com/authors/freepik) from [www.flaticon.com](http://www.flaticon.com) is licensed by [CC 3.0](http://creativecommons.org/licenses/by/3.0/).
 
 <sup><a name="note1">1</a></sup> It is possible for this counter to ['leap' sometimes](https://support.microsoft.com/en-us/kb/274323/en-gb); however this shouldn't be a problem for generating Id's.
