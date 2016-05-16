@@ -141,7 +141,7 @@ These methods (and their overloads that allow you to specify the epoch, `MaskCon
 
 <hr>
 
-[![Build status](https://ci.appveyor.com/api/projects/status/gw40b0nwaedgvilg?svg=true)](https://ci.appveyor.com/project/joshclark/flakey) <a href="https://www.nuget.org/packages/Flakey/"><img src="http://img.shields.io/nuget/v/Flakey.svg?style=flat-square" alt="NuGet version" height="18"></a> <a href="https://www.nuget.org/packages/Flakey/"><img src="http://img.shields.io/nuget/dt/Flakey.svg?style=flat-square" alt="NuGet downloads" height="18"></a>
+[![Build status](https://ci.appveyor.com/api/projects/status/gw40b0nwaedgvilg?svg=true)](https://ci.appveyor.com/project/joshclark/flakey) <a href="https://www.nuget.org/packages/Flakey/"><img src="http://img.shields.io/nuget/v/Flakey.svg?style=flat-square" alt="NuGet version" height="18"></a> 
 
 
 <sup><a name="note1">1</a></sup> It is possible for this counter to ['leap' sometimes](https://support.microsoft.com/en-us/kb/274323/en-gb); however this shouldn't be a problem for generating Id's.
