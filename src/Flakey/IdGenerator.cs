@@ -143,7 +143,6 @@ namespace Flakey
         /// </summary>
         /// <returns>Returns an Id based on the <see cref="IdGenerator"/>'s epoch, generatorid and sequence.</returns>
         /// <exception cref="InvalidSystemClockException">Thrown when clock going backwards is detected.</exception>
-        /// <exception cref="SequenceOverflowException">Thrown when sequence overflows.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public long CreateId()
         {
@@ -339,12 +338,10 @@ namespace Flakey
         {
             var timestamp = this.GetTimestamp() & MASK_TIME;
 
-            // This should complete within this millisecond.  If we spin more than 100ms, something is wrong.
-            const int maxSpin = 100;
-            bool completed = SpinWait.SpinUntil(() => (timestamp = this.GetTimestamp() & MASK_TIME) > lastTimestamp, maxSpin);
-            
-            if (!completed)
-                throw new SequenceOverflowException("Unable to wait for sequence to reset");
+            while (timestamp <= lastTimestamp)
+            {
+                timestamp = this.GetTimestamp() & MASK_TIME;
+            }
 
             return timestamp;
         }
