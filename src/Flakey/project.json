@@ -1,31 +1,42 @@
 ﻿{
-  "version": "1.0.0-rc1",
-  "copyright": "Copyright © Josh Clark 2016",
+  "version": "1.0.0",
   "description": "Twitter Snowflake-alike ID generator for .Net Core",
   "authors": [ "Josh Clark" ],
-  "tags": [ "snowflake", "unique", "id", "generator" ],
-  "projectUrl": "https://github.com/joshclark/Flakey",
-  "licenseUrl": "http://opensource.org/licenses/MIT",
+
+  "packOptions": {
+    "owners": [ "Josh Clark" ],
+
+    "copyright": "Copyright © Josh Clark 2016",
+    "tags": [ "snowflake", "unique", "id", "generator" ],
+    "projectUrl": "https://github.com/joshclark/Flakey",
+    "licenseUrl": "http://opensource.org/licenses/MIT"
+  },
+
+  "buildOptions": {
+    "warningsAsErrors": true
+  },
+
 
   "dependencies": {
-    "System.Collections.Concurrent": "4.0.11-beta-23516"
+    "NETStandard.Library": "1.5.0-rc2-24027"
   },
 
   "frameworks": {
     "net451": {
       "frameworkAssemblies": {
-        "System.Threading": "4.0.0.0"
+        "System.Threading": "4.0.0.0",
+        "System.Collections.Concurrent":  "4.0.0.0" 
       }
     },
-    "dotnet5.4": {
+    "netstandard1.5": {
+      "imports": "dnxcore50",
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516",
-        "System.Threading.Thread": "4.0.0-beta-23516"
+        "System.Collections": "4.0.11-*",
+        "System.Threading": "4.0.11-*",
+        "System.Threading.Thread": "4.0.0-*",
+        "System.Collections.Concurrent": "4.0.12-rc2-24027"
       }
-    }
+    }   
   }
 }

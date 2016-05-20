@@ -15,14 +15,7 @@ $PSScriptFilePath = (Get-Item $MyInvocation.MyCommand.Path).FullName
 
 $SolutionRoot = Split-Path -Path $PSScriptFilePath -Parent
 
-$DNU = "dnu"
-$DNVM = "dnvm"
-
-# ensure the correct version
-& $DNVM install 1.0.0-rc1-update1
-
-# use the correct version
-& $DNVM use 1.0.0-rc1-update1
+$DOTNET = "dotnet"
 
 # Make sure we don't have a release folder for this version already
 $BuildFolder = Join-Path -Path $SolutionRoot -ChildPath "build";
@@ -41,25 +34,25 @@ $ProjectJsonPath = Join-Path -Path $SolutionRoot -ChildPath "src\Flakey\project.
 # Set the copyright
 $DateYear = (Get-Date).year
 (gc -Path $ProjectJsonPath) `
-    -replace "(?<=`"copyright`":\s`")[\w\s�]*(?=`",)", "Copyright � Shannon Deminick $DateYear" |
+    -replace "(?<=`"copyright`":\s`")[\w\s�]*(?=`",)", "Copyright � Josh Clark $DateYear" |
     sc -Path $ProjectJsonPath -Encoding UTF8
 
 # Build the proj in release mode
 
-& $DNU restore "$ProjectJsonPath"
+& $DOTNET restore "$ProjectJsonPath"
 if (-not $?)
 {
-    throw "The DNU restore process returned an error code."
+    throw "The DOTNET restore process returned an error code."
 }
 
-& $DNU build "$ProjectJsonPath"
+& $DOTNET build "$ProjectJsonPath"
 if (-not $?)
 {
-    throw "The DNU build process returned an error code."
+    throw "The DOTNET build process returned an error code."
 }
 
-& $DNU pack "$ProjectJsonPath" --configuration Release --out "$ReleaseFolder"
+& $DOTNET pack "$ProjectJsonPath" --configuration Release --output "$ReleaseFolder"
 if (-not $?)
 {
-    throw "The DNU pack process returned an error code."
+    throw "The DOTNET pack process returned an error code."
 }

@@ -5,31 +5,23 @@ $PSScriptFilePath = (Get-Item $MyInvocation.MyCommand.Path).FullName
 $SolutionRoot = Split-Path -Path $PSScriptFilePath -Parent
 $TestsFolder = Join-Path -Path $SolutionRoot -ChildPath "test/Flakey.Tests";
 
-$DNU = "dnu"
-$DNX = "dnx"
-$DNVM = "dnvm"
+$DOTNET = "dotnet"
 
-# ensure the correct version
-& $DNVM install 1.0.0-rc1-update1
-
-# use the correct version
-& $DNVM use 1.0.0-rc1-update1
-
-& $DNU restore "$TestsFolder"
+& $DOTNET restore "$TestsFolder"
 if (-not $?)
 {
-	throw "The DNU restore process returned an error code."
+	throw "The DOTNET restore process returned an error code."
 }
 
-& $DNU build "$TestsFolder"
+& $DOTNET build "$TestsFolder"
 if (-not $?)
 {
-	throw "The DNU build process returned an error code."
+	throw "The DOTNET build process returned an error code."
 }
 
 # run them
-& $DNX -p "$TestsFolder" test
+& $DOTNET test "$TestsFolder" 
 if (-not $?)
 {
-	throw "The DNX test process returned an error code."
+	throw "The DOTNET test process returned an error code."
 }

@@ -322,12 +322,7 @@ namespace Flakey
         /// <returns>Returns a hashcode based on the <see cref="Environment.MachineName"/>.</returns>
         private static int GetMachineHash()
         {
-#if NET451
             return Environment.MachineName.GetHashCode();
-#else
-            // TODO:  This was added in RC2.  See https://github.com/dotnet/corefx/issues/4306. Until then...
-            return Environment.GetEnvironmentVariable("COMPUTERNAME").GetHashCode();
-#endif
         }
 
         /// <summary>
